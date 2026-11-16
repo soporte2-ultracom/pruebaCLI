@@ -143,6 +143,7 @@ function initApp() {
     let id;
     do { id = `${Date.now().toString(36)}-${++sequence}`; } while (tasks.some(task => task.id === id));
     tasks.unshift({ id, title: title.value.trim().slice(0, 160), description: description.value.trim().slice(0, 2000), completed: false });
+    if (deleted) deleted.index++;
     activeFilter = 'all';
     persist('Tarea añadida.');
     form.reset();

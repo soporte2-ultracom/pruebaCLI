@@ -138,6 +138,63 @@ test('Flujo real: rechaza espacios, crea texto seguro, completa, filtra, elimina
   assert.equal(writes, 5);
   assert.equal(makeApp({ getItem: () => raw }).get('#task-list').children.length, 1);
 });
+test('Deshacer B tras crear N restaura el orden exacto N, A, B, C', () => {
+  let raw = JSON.stringify(['A', 'B', 'C'].map(id => ({ id, title: id, completed: false })));
+  const { get } = makeApp({ getItem: () => raw, setItem: (key, value) => { raw = value; } });
+  const list = get('#task-list');
+  const titles = () => list.children.map(item => item.children[1].children[0].textContent);
+  assert.deepEqual(titles(), ['A', 'B', 'C']);
+  list.children[1].children[2].fire('click');
+  assert.deepEqual(titles(), ['A', 'C']);
+  get('#title').value = 'N';
+  get('#task-form').fire('submit');
+  assert.deepEqual(titles(), ['N', 'A', 'C']);
+  get('#undo-button').fire('click');
+  assert.deepEqual(titles(), ['N', 'A', 'B', 'C']);
+  assert.deepEqual(JSON.parse(raw).map(task => task.title), ['N', 'A', 'B', 'C']);
+});
+
+test('Deshacer conserva posiciones extremas, nuevas tareas, cambios de estado y filtros', () => {
+  for (const ids of [['A', 'B', 'C'], ['A']]) {
+    for (let index = 0; index < ids.length; index++) {
+      let raw = JSON.stringify(ids.map(id => ({ id, title: id, completed: false })));
+      const { get, filters } = makeApp({ getItem: () => raw, setItem: (key, value) => { raw = value; } });
+      const list = get('#task-list');
+      list.children[index].children[2].fire('click');
+      for (const title of ['N', 'M']) {
+        get('#title').value = title;
+        get('#task-form').fire('submit');
+      }
+      const checkbox = list.children[0].children[0];
+      checkbox.checked = true;
+      checkbox.fire('change');
+      filters[1].fire('click');
+      get('#undo-button').fire('click');
+      assert.deepEqual(JSON.parse(raw).map(task => task.title), ['M', 'N', ...ids]);
+      assert.equal(JSON.parse(raw)[0].completed, true);
+      assert.deepEqual(list.children.map(item => item.children[1].children[0].textContent), ['N', ...ids]);
+      filters[0].fire('click');
+      assert.deepEqual(list.children.map(item => item.children[1].children[0].textContent), ['M', 'N', ...ids]);
+      get('#undo-button').fire('click');
+      assert.deepEqual(JSON.parse(raw).map(task => task.title), ['M', 'N', ...ids]);
+      assert.equal(get('#undo-panel').hidden, true);
+    }
+  }
+});
+
+test('Otra eliminacion reemplaza la posicion pendiente de deshacer', () => {
+  let raw = JSON.stringify(['A', 'B', 'C'].map(id => ({ id, title: id, completed: false })));
+  const { get } = makeApp({ getItem: () => raw, setItem: (key, value) => { raw = value; } });
+  const list = get('#task-list');
+  list.children[1].children[2].fire('click');
+  get('#title').value = 'N';
+  get('#task-form').fire('submit');
+  list.children[1].children[2].fire('click');
+  get('#undo-button').fire('click');
+  assert.deepEqual(JSON.parse(raw).map(task => task.title), ['N', 'A', 'C']);
+  assert.deepEqual(list.children.map(item => item.children[1].children[0].textContent), ['N', 'A', 'C']);
+});
+
 test('La app sigue creando tareas con acceso a localStorage denegado', () => {
   const { get } = makeApp(new Error('Access denied'));
   assert.equal(get('#storage-warning').hidden, false);
