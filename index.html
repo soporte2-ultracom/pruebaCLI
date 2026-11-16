@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f7fb">
+  <title>TaskFlow · Tu espacio para avanzar</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="brand"><span class="brand-icon" aria-hidden="true">✓</span><a href="index.html">TaskFlow</a><span class="brand-note">MENOS RUIDO. MÁS FOCO.</span></header>
+    <main>
+      <section class="intro" aria-labelledby="page-title"><p class="eyebrow">TU DÍA, A TU RITMO</p><h1 id="page-title">Haz espacio para<br>lo que <span>importa.</span></h1><p>Una tarea a la vez. Un poco más cerca.</p></section>
+      <div class="workspace">
+        <section class="card composer" aria-labelledby="new-title">
+          <div class="section-icon" aria-hidden="true">＋</div><h2 id="new-title">Un nuevo paso</h2><p class="muted">Saca esa idea de tu cabeza.</p>
+          <form id="task-form">
+            <label for="title">¿Qué quieres hacer? <span class="required">*</span></label>
+            <input id="title" name="title" placeholder="Por ejemplo, preparar la presentación" required maxlength="160" autocomplete="off" aria-describedby="title-error">
+            <p id="title-error" class="field-error" hidden>Escribe un título que no esté vacío.</p>
+            <label for="description">Descripción <span class="optional">(opcional)</span></label>
+            <textarea id="description" name="description" placeholder="Añade detalles para cuando los necesites…" maxlength="2000" rows="4"></textarea>
+            <button class="primary" type="submit"><span aria-hidden="true">＋</span> Añadir tarea</button>
+          </form>
+          <p class="local-note"><span aria-hidden="true">▣</span> Tus tareas se guardan en este navegador.</p>
+        </section>
+        <section class="card tasks" aria-labelledby="tasks-title">
+          <div class="tasks-heading"><div><p class="eyebrow">UN PASO A LA VEZ</p><h2 id="tasks-title">Mis tareas</h2></div><span id="pending-count" class="count">0 pendientes</span></div>
+          <div class="filters" role="group" aria-label="Filtrar tareas por estado"><button type="button" data-filter="all" aria-pressed="true">Todas</button><button type="button" data-filter="pending" aria-pressed="false">Pendientes</button><button type="button" data-filter="completed" aria-pressed="false">Completadas</button></div>
+          <ul id="task-list" aria-label="Lista de tareas"></ul>
+          <div id="empty-state" class="empty"><span class="empty-icon" aria-hidden="true">✓</span><h3 id="empty-title">Todo empieza con un paso</h3><p id="empty-description">Añade tu primera tarea y dale espacio a tus ideas.</p></div>
+          <div class="list-footer"><span id="total-count">0 tareas en total</span><span>Pequeños pasos, grandes avances.</span></div>
+        </section>
+      </div>
+      <p id="storage-warning" class="warning" role="status" hidden></p>
+      <div id="undo-panel" class="undo" hidden><span>Tarea eliminada.</span><button id="undo-button" type="button">Deshacer</button></div>
+      <p id="announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+    </main>
+    <footer class="page-footer">Hecho para avanzar con calma.<span>TaskFlow · Tu espacio personal</span></footer>
+  </div>
+</body>
+</html>
